@@ -26,7 +26,7 @@
 
 	// Avoid prefixes (add chars that you want to prevent completion triggers)
 	"js_prefixes": [","],
-    
+
 
 	/**
 		Indexing Options
@@ -34,16 +34,16 @@
 
 	// update this to the app names you use for strict matching
 	// ensure you use a | to separate the names
-	// 
+	//
 	// for greedy matching make the value ".*"
 	// ex: "match_app_names": ".*",
-	// 
+	//
 	// for word matching use "\\w"
 	// ex: "match_app_names": "\\w",
 	"match_app_names": "app",
 
 	// AngularJS definitions to search for
-	"match_definitions": ["constant", "controller", "directive", "factory", "filter", "module", "service", "value"],
+	"match_definitions": ["constant", "controller", "component", "directive", "factory", "filter", "module", "service", "value"],
 	// directories you wish to ignore within your current working directory
 	"exclude_dirs":[
 		"node_modules/"
@@ -76,7 +76,7 @@
 
 
 
-	
+
 
 
 	/** ::NOTICE::

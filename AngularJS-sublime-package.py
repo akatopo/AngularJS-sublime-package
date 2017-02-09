@@ -314,12 +314,12 @@ class AngularJS():
 			tuple([
 				'ngDir_' + self.definitionToDirective(directive) + '\tAngularJS',
 				('data-' if self.settings.get('enable_data_prefix') else '') + self.definitionToDirective(directive)+'="$1"$0'
-			]) for directive in indexes if re.match('directive:', directive[0])
+			]) for directive in indexes if re.match('(directive|component):', directive[0])
 		]
 		return list(set(indexed_attrs))
 
 	def definitionToDirective(self, directive):
-		return re.sub('([a-z0-9])([A-Z])', r'\1-\2', directive[0].replace('directive:  ', '')).lower()
+		return re.sub('([a-z0-9])([A-Z])', r'\1-\2', re.sub('(directive|component):  ', '', directive[0])).lower()
 
 	def process_attributes(self):
 		add_data_prefix = self.settings.get('enable_data_prefix')
@@ -415,11 +415,11 @@ class AngularJSEventListener(sublime_plugin.EventListener):
 			return ng.completions(view, prefix, locations, False)
 
 	def on_post_save(self, view):
-		
+
 		match_expression = ng.settings.get('match_expression')
 		match_app_names = ng.settings.get('match_app_names', 'app')
 		match_expression = match_expression.replace('{match_app_names}', match_app_names)
-		
+
 		thread = AngularJSThread(
 			file_path = view.file_name(),
 			folder_exclude_patterns = view.settings().get('folder_exclude_patterns'),
@@ -728,7 +728,7 @@ class AngularJSThread(threading.Thread):
 						definition_value = matched[1].group(int(self.kwargs['match_expression_group']))
 						definition_name += definition_value
 						project_index.append([definition_name, file_path, str(line_number)])
-						if(matched[0] == 'directive'): previous_matched_directive = definition_value
+						if(matched[0] in ['directive', 'component']): previous_matched_directive = definition_value
 						else: previous_matched_directive = '';
 				line_number += 1
 			ng.add_indexes_to_cache([project_index, self.attribute_dict])
@@ -754,7 +754,7 @@ class AngularJSThread(threading.Thread):
 						definition_value = matched[1].group(int(self.kwargs['match_expression_group']))
 						definition_name += definition_value
 						self.function_matches.append([definition_name, _abs_file_path, str(line_number)])
-						if(matched[0] == 'directive'): previous_matched_directive = definition_value
+						if(matched[0] in ['directive', 'component']): previous_matched_directive = definition_value
 						else: previous_matched_directive = '';
 				line_number += 1
 
@@ -763,7 +763,7 @@ class AngularJSThread(threading.Thread):
 			line_content = line_content.decode('utf8')
 		except:
 			return
-		match = re.findall(r'(\w+.)[:\s]+[\'"](\=|@|&)[\'"]', line_content)
+		match = re.findall(r'(\w+.)[:\s]+[\'"](\=\??|@|&|<\??)[\'"]', line_content)
 		if(match):
 			directive = ng.definitionToDirective([directive])
 			if directive not in self.attribute_dict:
